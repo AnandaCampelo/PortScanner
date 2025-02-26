@@ -5,7 +5,7 @@
 - Escaneamento de um host ou uma rede;
 - Controle de range (intervalo) de portas a serem escaneadas;
 - Well Known Ports: Especifica o número da porta e o nome do serviço associado;
-- Detecção do estado das portas[^1].
+- Detecção do estado das portas[^1];
 - Opção de escaneamento UDP;
 - Detecção do sistema operacional via banner grabbing;
 - Suporte a IPv6;
