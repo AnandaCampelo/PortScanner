@@ -3,7 +3,6 @@ import argparse
 import sys
 import ipaddress
 
-# Dicionário de portas conhecidas e serviços
 WELL_KNOWN_PORTS = {
     20: "FTP (Data)",
     21: "FTP (Control)",
@@ -17,7 +16,6 @@ WELL_KNOWN_PORTS = {
     443: "HTTPS",
     3306: "MySQL",
     3389: "RDP",
-    # Adicione mais portas conforme necessário
 }
 
 def scan_port(ip, port):
@@ -50,23 +48,21 @@ def scan_udp_port(ip, port):
 
 def detect_os(ip):
     try:
-        # Tenta se conectar a portas comuns e capturar banners
         banners = {}
-        common_ports = [21, 22, 80, 443]  # Portas comuns para banner grabbing
+        common_ports = [21, 22, 80, 443]
 
         for port in common_ports:
             try:
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.settimeout(1)
                 sock.connect((ip, port))
-                sock.send(b"GET / HTTP/1.1\r\n\r\n")  # Envia uma solicitação HTTP (para portas 80/443)
+                sock.send(b"GET / HTTP/1.1\r\n\r\n")
                 banner = sock.recv(1024).decode().strip()
                 banners[port] = banner
                 sock.close()
             except:
                 continue
 
-        # Analisa os banners para tentar identificar o sistema operacional
         if 22 in banners and "SSH" in banners[22]:
             return "Linux/Unix (SSH)"
         elif 80 in banners and "Apache" in banners[80]:
@@ -90,7 +86,6 @@ def main():
     args = parser.parse_args()
 
     try:
-        # Verifica se o alvo é uma rede CIDR ou um IP único
         if '/' in args.target:
             network = ipaddress.ip_network(args.target, strict=False)
             targets = network.hosts()
@@ -100,7 +95,6 @@ def main():
         print("Invalid IP address or network")
         sys.exit(1)
 
-    # Verifica se o intervalo de portas é único ou um intervalo
     if '-' in args.ports:
         start_port, end_port = map(int, args.ports.split('-'))
         single_port = False
@@ -120,12 +114,10 @@ def main():
             else:
                 status = scan_port(str(target), port)
 
-            # Exibe a porta se for única ou se estiver aberta
             if single_port or status == "Open":
                 service = WELL_KNOWN_PORTS.get(port, "Unknown")
                 print(f"Port {port}: {status} - {service}")
 
-        # Detecção de sistema operacional
         if args.os:
             print("\nDetecting operating system...")
             os_info = detect_os(str(target))
